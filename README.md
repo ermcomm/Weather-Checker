@@ -19,7 +19,7 @@ Searched addresses can be saved and viewed.
 - General Aesthetics/UI upgrade
 - Record sorting/filtering
 - Complete CRUD, currently only creating/reading
-- Update line graph aesthetics/readablity
+- Update line graph aesthetics/readablity (Set y-axis locations)
 - Manage Django localisation/unlocalisation of timezones (timezones calculated correctly but django templating gives unexpected results sometimes)
 
 
