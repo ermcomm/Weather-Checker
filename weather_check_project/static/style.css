@@ -1,0 +1,61 @@
+:root {
+    --base_color: #0ee05b;
+}
+
+.formTextInput {
+    width: 95%;
+}
+
+#id_alternative_addresses {
+    width: 100%;
+}
+
+.navbar {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.btn-primary {
+    background-color: var(--base_color) !important;
+    color: black !important;
+
+}
+
+.card-header {
+    background-color: #20955f1a !important;
+
+    color: black !important;
+}
+
+.temp_sub_headers {
+    font-size: 12pt;
+
+}
+
+.temp_sub_headers:hover {
+    font-size: 13pt;
+    font-weight: bold;
+}
+
+.sub_header_descrips {
+    color: gray;
+    font-size: 10pt;
+}
+
+#windsock_icon {
+    width: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.forecast_icons {
+    width: 0.75rem;
+}
+
+.forecast_time_date {
+    color: gray;
+    font-size: 8pt;
+}
+
+.list_view_stat_col {
+    text-align: center;
+}

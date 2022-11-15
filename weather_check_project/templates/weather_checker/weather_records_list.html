@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% include 'header.html' %}
+
+{% block content %}
+
+<div class="card shadow my-2">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-8 my-auto">
+                <h4>Saved Weather Records</h4>
+            </div>
+            <div class="col" style="text-align:right">
+                <a href="{% url 'landing' %}" class="btn btn-info my-2 mx-auto submit_btn mx-auto" role="button"
+                    aria-pressed="true">Back to weather!</a>
+            </div>
+        </div>
+
+    </div>
+    <div class="card-body">
+        {% for object in object_list %}
+        <div class="row" style="margin-bottom: 1rem;"></div>
+        <div class="card-body shadow">
+
+            <div class="row">
+                <div class="col-8">
+                    <h6>{{object.searched_address}}</h6>
+                </div>
+                <div class="col" style="text-align: right;">
+                    <h6>{{ object.time_of_search }}</h6>
+                </div>
+            </div>
+            <hr>
+            <div class="row mx-auto my-auto">
+                <div class="col mx-auto">
+                    <img src="http://openweathermap.org/img/wn/{{ object.weather_icon }}@2x.png">
+                </div>
+                <div class="col mx-auto my-auto list_view_stat_col">
+                    <h5>
+                        {{ object.temp|floatformat:1 }}&degC
+                    </h5>
+                    <p class="sub_header_descrips">{{ object.weather }}</p>
+                </div>
+                <div class="col mx-auto my-auto list_view_stat_col">
+                    <div class="row" style="margin-bottom: 0.75rem;">
+                        <div class="col">
+                            <img id="windsock_icon" src="{% static 'hot.png' %}">
+                            <span class="temp_sub_headers">{{ object.max_temp|floatformat:1 }}&degC</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <img id="windsock_icon" src="{% static 'cold.png' %}">
+                            <span class="temp_sub_headers">{{ object.min_temp|floatformat:1 }}&degC</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col mx-auto my-auto list_view_stat_col">
+                    <h5>
+                        {{ object.feels_like_temp|floatformat:1 }}&degC
+                    </h5>
+                    <p class="sub_header_descrips">feels like</p>
+                </div>
+                <div class="col mx-auto my-auto list_view_stat_col">
+                    <h5>
+                        {{ object.cloud_cover }}%
+                    </h5>
+                    <p class="sub_header_descrips">cloud cover</p>
+                </div>
+                <div class="col mx-auto my-auto list_view_stat_col">
+                    <div class="row" style="margin-bottom: 0.75rem;">
+                        <div class="col">
+                            <img id="windsock_icon" src="{% static 'windsock.png' %}">
+                            <span class="temp_sub_headers">{{ object.wind_speed|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <img id="windsock_icon" src="{% static 'compass.png' %}">
+                            <span class="temp_sub_headers">{{ object.wind_direction|floatformat:1 }}&deg</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col mx-auto my-auto list_view_stat_col">
+                    <h5>
+                        {{ object.humidity }}%
+                    </h5>
+                    <p class="sub_header_descrips">humidity</p>
+                </div>
+
+            </div>
+        </div>
+        {% empty %}
+        <h4> No records saved</h4>
+    </div>
+    {% endfor %}
+</div>
+</div>
+
+{% endblock %}

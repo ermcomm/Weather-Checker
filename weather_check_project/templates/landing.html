@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load l10n %}
+{% block content %}
+
+<div class="card shadow" style="margin-top: 1rem;">
+    <div class="card-header">
+        <nav class="navbar my-0">
+
+            <div class="col-10">
+                <h3> Weather Checker Appy Thingy</h3>
+            </div>
+            <div class="col" style="text-align: right;">
+                <a class="navbar-brand" href="#">
+                    <img src="{% static 'GitHub-Mark-64px.png' %}" width="30" height="30" alt="">
+                </a>
+            </div>
+
+
+        </nav>
+    </div>
+    <div class="card-body my-1">
+        <div class="row">
+            <div class="col-6">
+                <form name='address_form' action="" method="GET">
+
+                    <div class="row">
+                        <div class="col mx-auto my-auto" style="text-align: center;">
+                            {{ form.address }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mx-auto my-auto" style="text-align: center;">
+                            <div class="row">
+                                <div class="col">
+                                    <a href="{% url 'view_records' %}"
+                                        class="btn btn-info my-2 mx-auto submit_btn mx-auto" role="button"
+                                        aria-pressed="true">View Records</a>
+                                </div>
+                                <div class="col" style="text-align: left">
+                                    <button id='save_record_btn' class="btn btn-info my-2 mx-auto submit_btn mx-auto"
+                                        onClick="send_ajax()" value="{{ save_record }}">Save this
+                                        Record</button>
+                                </div>
+                                <div class="col">
+                                    <button class="btn btn-success my-2 mx-auto submit_btn mx-auto" name="address_typed"
+                                        value='true' type="submit">Get
+                                        Weather!</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div id="message"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow my-1">
+                        <div class="card-header">
+                            Showing Weather Info for
+                        </div>
+                        <div class="card-body">
+                            {% if not address_name %}
+                            <h6>No address searched</h6>
+                            {% else %}
+                            {% for line in address_name %}
+                            <div class="row">
+                                <h6>{{ line }}</h6>
+                            </div>
+                            {% endfor %}
+                            <span style="font-weight: bold;">Lat:</span> {{ coords.0 }}
+                            <span style="font-weight: bold;">Lon: </span> {{ coords.1 }}
+                            <hr>
+                            <p>Not the address you meant? Select a similar address:</p>
+                            {{ form.alternative_addresses }}
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-6">
+                <div id='map' style='width: 100%; height: 100%;'></div>
+            </div>
+        </div>
+        <div class="row my-2">
+            <div class="col-4">
+                <div class="card shadow" style="height: 100%">
+                    <div class="card-header">
+                        <h6>Current Weather</h6>
+                    </div>
+                    <div class="card-body" style="text-align: center">
+                        <div class=row>
+                            <div class="col">
+                                <h1 style="display:inline;">{{ current_weather.main.temp|floatformat:1 }} &degC</h1>
+                                <img src="http://openweathermap.org/img/wn/{{ current_weather.weather.0.icon }}@2x.png">
+                                <p>Feels Like {{ current_weather.main.feels_like|floatformat:1 }}&degC</p>
+                                <div class="row">
+                                    <div class="col mx-auto">
+                                        <img id="windsock_icon" src="{% static 'cold.png' %}">
+                                        <span class="temp_sub_headers">{{ current_weather.main.temp_min|floatformat:1 }}&deg</span>
+                                        <p class="sub_header_descrips">min</p>
+                                    </div>
+                                    <div class="col mx-auto">
+                                        <img id="windsock_icon" src="{% static 'hot.png' %}">
+                                        <span class="temp_sub_headers">{{ current_weather.main.temp_max|floatformat:1 }}&deg</span>
+                                        <p class="sub_header_descrips">max</p>
+                                    </div>
+                                    <div class="col mx-auto">
+                                        <img id="windsock_icon" src="{% static 'humidity.png' %}">
+                                        <span class="temp_sub_headers">{{ current_weather.main.humidity }}</span>
+                                        <p class="sub_header_descrips">humidity</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class=row>
+                            <div class="col">
+                                <img id="windsock_icon" src="{% static 'windsock.png' %}">
+                                <span class="temp_sub_headers">{{ current_weather.wind.speed }} Km/h</span>
+                                <p class="sub_header_descrips">{{ current_weather.wind.deg }} deg</p>
+                            </div>
+                            <div class="col">
+                                <img id="windsock_icon" src="{% static 'cloud.png' %}">
+                                <span class="temp_sub_headers">{{ current_weather.clouds.all }} %</span>
+                                <p class="sub_header_descrips">cloud cover</p>
+                            </div>
+                        </div>
+                        <div class=row>
+                            <div class="col">
+                                <img id="windsock_icon" src="{% static 'sunrise.png' %}">
+                                <span class="temp_sub_headers">{{ current_weather.sys.sunrise|unlocalize }}</span>
+                                <p class="sub_header_descrips">sun rise</p>
+                            </div>
+                            <div class="col">
+                                <img id="windsock_icon" src="{% static 'sunset.png' %}">
+                                <span class="temp_sub_headers">{{ current_weather.sys.sunset|unlocalize }}</span>
+                                <p class="sub_header_descrips">sun set</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow" style="height:100%">
+                    <div class="card-header">
+                        <h6>24 H Forecast</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+
+                            {% for forecast in hourly_forecast %}
+                            {% localize off %}
+                            <div class="col-3" data-toggle="tooltip" data-placement="bottom" title="{{forecast.dt}}">
+                                <div class="row" style="text-align: center;">
+                                    <span class="forecast_time_date">{{ forecast.dt }}</span>
+                                    <div class="col-6" style="text-align: left;">
+                                        <img class="forecast_icon"
+                                            src="http://openweathermap.org/img/wn/{{ forecast.weather.0.icon }}@2x.png">
+                                    </div>
+                                    <div class="col-6 my-auto" style="text-align: center;">
+
+                                        <h4 style="margin-bottom: 0rem !important;">
+                                            {{ forecast.main.temp|floatformat:0 }}&deg
+                                        </h4>
+                                        <span>
+                                            {{ forecast.clouds.all|floatformat:0 }}
+                                            <img class="forecast_icons" src="{% static 'cloud.png' %}">
+                                        </span>
+                                        <br>
+                                        <span>
+                                            {{ forecast.wind.speed|floatformat:1 }}
+                                            <img class="forecast_icons" src="{% static 'windsock.png' %}">
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endlocalize %}
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h6>5 Day Forecast every 3 Hours</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="long_forecast_chart">
+
+                        </canvas>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div id="test"></div>
+<form id="hidden_coords_form" name="hidden_coords_form" action="" method="GET">
+    <input id='marker_coords_input' name="map_marker_coords" value="[0, 0]">
+    asd
+</form>
+
+<script>
+    {% if coords %}
+    let coords_center = [{{ coords.0 }}, {{ coords.1 }}]; // starting position [lng, lat]
+    {% else %}
+    let coords_center = [-26.122939217925367, 28.030899766194413]
+    {% endif %}
+
+    mapboxgl.accessToken = '{{ mapbox_api_key }}';
+    const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style: 'mapbox://styles/mapbox/streets-v11', // style URL
+        center: coords_center, // starting position [lng, lat]
+
+        zoom: 4, // starting zoom
+        projection: 'globe' // display the map as a 3D globe
+    });
+    // map.on('style.load', () => {
+    //     map.setFog({}); // Set the default atmosphere style
+    // });
+
+    map.on('click', (e) => {
+        let coords = e.lngLat;
+        let lat = coords.lat;
+        let lon = coords.lng;
+        console.log('>', lat, lon)
+    })
+
+    const marker = new mapboxgl.Marker({
+        color: "red",
+        draggable: true
+    }).setLngLat(coords_center)
+        .addTo(map);
+
+    function onDragEnd() {
+        const lngLat = marker.getLngLat();
+        $('#test').html(`[${lngLat.lng}, ${lngLat.lat}]`)
+        $('#marker_coords_input').val(`[${lngLat.lng}, ${lngLat.lat}]`)
+        $('#hidden_coords_form').submit(function ($) { })
+        document.getElementById("hidden_coords_form").submit();
+    };
+
+    marker.on('dragend', onDragEnd);
+
+    var five_day_forecast_data_temp = {
+        label: "Temperature",
+        yAxisId: 'Temp',
+        data: [{% for x in five_day_forecast %} {{ x.main.temp }}, {% endfor %}],
+        lineTension: 0.5,
+        pointRadius: 0,
+        borderColor: '#f7a40e'
+    };
+
+    var five_day_forecast_data_cloud = {
+        label: "Cloud Coverage %",
+        yAxisID: 'Cloud',
+        data: [{% for x in five_day_forecast %} {{ x.clouds.all }}, {% endfor %}],
+        lineTension: 0.5,
+        pointRadius: 0,
+        borderColor: '#680ef7'
+    };
+
+    var five_day_forecast_data_wind = {
+        label: "Wind Speed",
+        yAxisID: 'Wind',
+        data: [{% for x in five_day_forecast %} {{ x.wind.speed }}, {% endfor %}],
+        lineTension: 0.5,
+        pointRadius: 0,
+        borderColor: '#0ef740'
+    };
+
+
+    var five_day_forecast_data = {
+        labels: [{% for x in five_day_forecast %} '{{x.dt | date:"D"}}, {{x.dt.time}}', {% endfor %}],
+        datasets: [five_day_forecast_data_temp, five_day_forecast_data_cloud, five_day_forecast_data_wind]
+    };
+
+    var chartOptions = {
+        legend: {
+            display: true,
+            position: 'top',
+        },
+       scales: {
+            xAxes: [{
+                ticks: {
+                    maxTicksLimit: 8
+                }
+            }]
+        }
+    };
+
+    var lineChart = new Chart(document.getElementById('long_forecast_chart'), {
+        type: 'line',
+        data: five_day_forecast_data,
+        options: chartOptions,
+    });
+
+    function send_ajax() {
+        event.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "{% url 'save_record' %}",
+            data: {
+                'save_record': $('#save_record_btn').val(),
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+
+            success: function (response) {
+                $('#message').show()
+                $('#message').html(`<h6>${response}</h6>`)
+                setTimeout(() => { $('#message').hide() }, 3000)
+            }
+        });
+        return false;
+    };
+
+    function view_records() {
+        window.location.href = "{% url 'view_records' %}"
+    };
+
+</script>
+{% endblock %}
