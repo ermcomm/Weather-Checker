@@ -17,6 +17,7 @@ Searched addresses can be saved and viewed.
 ###### To do:
 - Add Imperial/Metric toggle to set units displayed
 - General Aesthetics/UI upgrade
+- Complete CRUD, currently only creating/reading
 - Update line graph aesthetics/readablity
 - Manage Django localisation/unlocalisation of timezones (timezones calculated correctly but django templating gives unexpected results sometimes)
 
