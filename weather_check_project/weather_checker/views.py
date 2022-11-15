@@ -10,9 +10,9 @@ import json
 
 
 def save_record(request):
+    '''Ajax call to save record, return success/fail message'''
     if request.POST['save_record'] != '':
         results = json.loads(request.POST['save_record'])
-        print(results)
         # create new record model object
         weather_records(
             time_of_search=results['time'],
@@ -45,13 +45,6 @@ def landing(request):
     units = 'metric'
     searched_by_map_marker = False
     if request.method == 'GET':
-        # if asked to save record
-        if 'save_record' in request.GET:
-            print(request.GET['save_record'])
-            context['coords'] = request.GET['save_record'][2]
-            context['address_name'] = request.GET['save_record'][1]
-            messages.success(request, 'Weather Record Saved!')
-            return render(request, "landing.html", context)
         # if the GET is not searching for a previously provided alt address from dropdown, use address in text-input
         if 'address_typed' in request.GET:
             searched_address = request.GET['address']
@@ -59,44 +52,36 @@ def landing(request):
             searched_address = request.GET['alternative_addresses']
         # if searching on map marker coords (no adress provided only coords)
         elif 'map_marker_coords' in request.GET:
-            print('??????????????????????????????????????????????')
-            print(request.GET)
             searched_by_map_marker = True
             context['address_name'] = searched_address = reverse_geocode(
                 request.GET['map_marker_coords'])
-            print('!!!!!!!!!!!!!!!!', searched_address)
-            # context['current_weather'], context['hourly_forecast'], context['five_day_forecast'] = get_weather_info(
-            #     context['coords'], units)
-        else:
+        else:  # catch-al, set searched address to default
             searched_address = '342 Jan Smuts ave, Hyde Park, Johannesburg'
         form = address_form(
             request.GET, searched_address=searched_address, alternative_addresses=[('', '')])  # set alternative addresses to blank so we can init form and validate received GET info
         if form.is_valid():
-            if not searched_by_map_marker:  # form submitted by map marker drag/drop, dont need to get coordinates via api
+            if not searched_by_map_marker:  # if form submitted with typed address or drop-down alternative address
                 context['coords'], context['address_name'], context['alternative_addresses'], context['mapbox_api_key'] = get_coordinates(
                     searched_address)
                 context['current_weather'], context['hourly_forecast'], context['five_day_forecast'] = get_weather_info(
                     context['coords'], units)
-            else:
+            else:  # form submitted by map marker drag/drop, dont need to get coordinates via api, only get address from map coords
                 context['current_weather'], context['hourly_forecast'], context['five_day_forecast'] = get_weather_info(
                     context['address_name'], units)
             form = address_form(
                 request.GET, searched_address=searched_address, alternative_addresses=context['alternative_addresses'])  # re init form after validation with additional data for alternative address dropdown
         else:  # if form is invalid, revert to default address
-            print('here')
             context['coords'], context['address_name'], context['alternative_addresses'], context['mapbox_api_key'] = get_coordinates(
                 searched_address)
             context['current_weather'], context['hourly_forecast'], context['five_day_forecast'] = get_weather_info(
                 context['coords'], units)
             form = address_form(searched_address=searched_address, alternative_addresses=[
                 ('No Address Searched Yet', '')])
-        # timestamp of search if record is saved to db
-        print('mmm', context['current_weather'])
+    # create json of data displayed.  Use this to create record if user saves record
     context['save_record'] = json.dumps({'time': str(datetime.now()), 'address': context['address_name'],
                                          'coords': context['coords'], 'weather': context['current_weather']['main'], 'weather_wind':  context['current_weather']['wind'], 'weather_cloud':
                                         context['current_weather']['clouds'], 'icon': context['current_weather']['weather'][0]['icon'],  'weather_desc': context['current_weather']['weather'][0]['description']})
     # split address on , so we can generate individual divs for each address line
-    print('!!!!!!!!!!!!!!!!', searched_address)
     context['address_name'] = context['address_name'].split(",")
     context['form'] = form
     return render(request, "landing.html", context)

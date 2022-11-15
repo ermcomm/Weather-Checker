@@ -1,1 +1,0 @@
-Django Weather Checking App

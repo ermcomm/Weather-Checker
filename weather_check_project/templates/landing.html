@@ -5,19 +5,7 @@
 
 <div class="card shadow" style="margin-top: 1rem;">
     <div class="card-header">
-        <nav class="navbar my-0">
-
-            <div class="col-10">
-                <h3> Weather Checker Appy Thingy</h3>
-            </div>
-            <div class="col" style="text-align: right;">
-                <a class="navbar-brand" href="#">
-                    <img src="{% static 'GitHub-Mark-64px.png' %}" width="30" height="30" alt="">
-                </a>
-            </div>
-
-
-        </nav>
+        {% include 'header.html' %}
     </div>
     <div class="card-body my-1">
         <div class="row">
@@ -219,8 +207,7 @@
         container: 'map', // container ID
         style: 'mapbox://styles/mapbox/streets-v11', // style URL
         center: coords_center, // starting position [lng, lat]
-
-        zoom: 4, // starting zoom
+        zoom: 5, // starting zoom
         projection: 'globe' // display the map as a 3D globe
     });
     // map.on('style.load', () => {
@@ -242,9 +229,7 @@
 
     function onDragEnd() {
         const lngLat = marker.getLngLat();
-        $('#test').html(`[${lngLat.lng}, ${lngLat.lat}]`)
         $('#marker_coords_input').val(`[${lngLat.lng}, ${lngLat.lat}]`)
-        $('#hidden_coords_form').submit(function ($) { })
         document.getElementById("hidden_coords_form").submit();
     };
 
@@ -265,7 +250,7 @@
         data: [{% for x in five_day_forecast %} {{ x.clouds.all }}, {% endfor %}],
         lineTension: 0.5,
         pointRadius: 0,
-        borderColor: '#680ef7'
+            borderColor: '#680ef7'
     };
 
     var five_day_forecast_data_wind = {
@@ -288,7 +273,7 @@
             display: true,
             position: 'top',
         },
-       scales: {
+        scales: {
             xAxes: [{
                 ticks: {
                     maxTicksLimit: 8

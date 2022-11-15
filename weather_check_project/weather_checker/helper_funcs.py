@@ -23,7 +23,6 @@ def get_coordinates(searched_address):
     # make api call with address
     api_call = f"""https://api.mapbox.com/geocoding/v5/mapbox.places/{searched_address}.json?proximity=-73.990593%2C40.740121&types=place%2Cpostcode%2Caddress&access_token={mapbox_api_key}"""
     mapbox_result = requests.get(api_call).json()
-    print('nnnnnnnnnnnnnnnnnn', mapbox_result)
     # grab coords of first set rteturned.
     coords = mapbox_result['features'][0]['center']
     address_name = mapbox_result['features'][0]['place_name']
@@ -51,9 +50,6 @@ def get_weather_info(coords, units):
         forecast['dt'] = convert_date_time(forecast['dt'], forecast_timezone)
     # grab only the first 8 predictions (=24 hours) for 24 H forecast
     open_weather_results_forecast_hourly = open_weather_results_forecast_hourly['list'][:12]
-    # for forecast in open_weather_results_forecast_hourly:
-    #     print(forecast)
-    #     forecast['dt'] = convert_date_time(forecast['dt'], forecast_timezone)
     # convert sunrise/sunset times from unix to local (grab address timezone and adjust)
     open_weather_results_current['sys']['sunrise'] = convert_time(
         open_weather_results_current['sys']['sunrise'], open_weather_results_current['timezone'])
@@ -64,16 +60,10 @@ def get_weather_info(coords, units):
 
 def reverse_geocode(coords):
     """Get address from coords received from map drag/drop"""
-    print(coords, type(coords))
-    # convert from str received from js to list
+    # receive a str from js, convert to list
     coords = coords.replace('[', '').replace(']', '').split(",")
-    print(coords)
     mapbox_api_key = api_configs.objects.get(
         api='mapbox').api_token
     api_call = f'''https://api.mapbox.com/geocoding/v5/mapbox.places/{coords[0].replace("'", "").strip()},{coords[1].replace("'", "").strip()}.json?types=place%2Cpostcode%2Caddress&limit=1&access_token={mapbox_api_key}'''
     address = requests.get(api_call).json()['features'][0]['place_name']
-    print(api_call)
-    print(address)
-    print('xxxxxxxxxxx')
-
     return(address)
